@@ -1,6 +1,8 @@
-import { ProductMobileSlideShow, ProductSlideShow, QuantitySelector, SizeSelector } from "@/components";
+export const revalidate = 604800; // 7 días
+
+import { getProductBySlug } from "@/actions";
+import { ProductMobileSlideShow, ProductSlideShow, QuantitySelector, SizeSelector, StockLabel } from "@/components";
 import { titleFont } from "@/config/fonts";
-import { initialData } from "@/seed/seed";
 import { notFound } from "next/navigation";
 
 
@@ -11,11 +13,11 @@ interface Props {
     }
 }
 
-export default function ProductBySlugPage({ params }: Props) {
+export default async function ProductBySlugPage({ params }: Props) {
 
     const { slug } = params;
 
-    const product = initialData.products.find(product => product.slug === slug);
+    const product = await getProductBySlug(slug)
 
     if (!product) {
         notFound()
@@ -26,14 +28,15 @@ export default function ProductBySlugPage({ params }: Props) {
             {/* Slideshow */}
             <div className="col-span-1 md:col-span-2">
                 {/* Mobile Slide Show */}
-                <ProductMobileSlideShow title={product.title} images={product.images} className="block md:hidden" />
+                <ProductMobileSlideShow title={product.title} images={product.image} className="block md:hidden" />
 
                 {/* Desktop Slide Show */}
-                <ProductSlideShow title={product.title} images={product.images} className="hidden md:block" />
+                <ProductSlideShow title={product.title} images={product.image} className="hidden md:block" />
             </div>
 
             {/* Detalles */}
             <div className="col-span-1 px-5">
+                <StockLabel slug={product.slug} />
                 <h1 className={`${titleFont.className} antialiased font-bold text-xl`}>
                     {product.title}
                 </h1>
